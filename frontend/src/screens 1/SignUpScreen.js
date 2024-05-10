@@ -40,6 +40,13 @@ const SignUpScreen = ({ navigation }) => {
         <Image
           source={require("../../assets/logo.png")}
           style={{ width: 150, height: 150, alignSelf: "center" }}
+        />{" "}
+        <Input
+          placeholder="Email"
+          containerStyle={{ marginTop: 10, width: 300 }}
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          leftIcon={<Icon name="envelope" size={16} />}
         />
         <Input
           placeholder="Email"
