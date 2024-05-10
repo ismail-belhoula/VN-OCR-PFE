@@ -9,6 +9,7 @@ import {
   CombinedScreen,
 } from "../../screens 1/screens.js"; // Import from screens.js
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import RootNavigation from "../../navigation/index.js";
 
 const Drawer = createDrawerNavigator();
 
@@ -20,8 +21,8 @@ const AppNavigator = () => {
         <Drawer.Screen name="Combined" component={CombinedScreen} />
         <Drawer.Screen name="Profile" component={ProfileScreen} />
         <Drawer.Screen
-          name="AuthStack"
-          component={AuthStack}
+          name="RootNavigation"
+          component={RootNavigation}
           options={{ headerShown: false }}
         />
       </Drawer.Navigator>

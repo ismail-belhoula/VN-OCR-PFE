@@ -20,9 +20,11 @@ const SignInScreen = ({ navigation }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
+      console.log("iscatch called ?");
       setvalidationMessage(error.message);
       console.error(error); // Log the error
     }
+    RootNavigation();
   }
 
   return (
