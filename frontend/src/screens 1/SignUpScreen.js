@@ -48,13 +48,7 @@ const SignUpScreen = ({ navigation }) => {
           onChangeText={(text) => setEmail(text)}
           leftIcon={<Icon name="envelope" size={16} />}
         />
-        <Input
-          placeholder="Email"
-          containerStyle={{ marginTop: 10, width: 300 }}
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          leftIcon={<Icon name="envelope" size={16} />}
-        />
+
         <Input
           placeholder="Password"
           containerStyle={{ marginTop: 10, width: 300 }}
