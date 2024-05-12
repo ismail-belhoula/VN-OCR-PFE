@@ -7,6 +7,8 @@ import {
   TextInput,
   Image,
   ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Camera from "expo-camera";
@@ -151,11 +153,18 @@ export default function CombinedScreen() {
     // If showText is false, render the camera screen
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Button title="Take Photo" onPress={selectImageFromCamera} />
-        <Button
-          title="Select Image from Gallery"
+        <TouchableOpacity
+          style={styles.buttons}
+          onPress={selectImageFromCamera}
+        >
+          <Text>Take a Photo</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttons}
           onPress={selectImageFromGallery}
-        />
+        >
+          <Text>Upload a Photo</Text>
+        </TouchableOpacity>
         {image && (
           <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
         )}
@@ -164,3 +173,31 @@ export default function CombinedScreen() {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  buttons: {
+    width: 160,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    margin: 20,
+    height: 55,
+    textAlign: "center",
+    borderRadius: 50,
+    overflow: "hidden",
+    backgroundColor: "#25aae1",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#4184ea",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  bn632HoverText: {
+    color: "#fff",
+  },
+});

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useAuthentication } from "../../utils/hooks/useAuthentication";
 import { Button } from "react-native-elements";
 import { getAuth, signOut } from "firebase/auth";
@@ -10,16 +10,15 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text>Welcome {user?.email}!</Text>
-      <Button
-        title="Sign Out"
-        style={{ marginTop: 10 }}
-        onPress={() => signOut(auth)}
-      />
-      <Button
-        title="Use OCR"
-        style={{ marginTop: 10 }}
+      <TouchableOpacity style={styles.buttons} onPress={() => signOut(auth)}>
+        <Text>Sign Out</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.buttons}
         onPress={() => navigation.navigate("Combined")}
-      />
+      >
+        <Text>Use OCR</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -30,5 +29,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttons: {
+    width: 160,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    margin: 20,
+    height: 55,
+    textAlign: "center",
+    borderRadius: 50,
+    overflow: "hidden",
+    backgroundColor: "#25aae1",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#4184ea",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  bn632HoverText: {
+    color: "#fff",
   },
 });

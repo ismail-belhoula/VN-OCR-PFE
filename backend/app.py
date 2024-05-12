@@ -20,7 +20,7 @@ def extract_text():
         image = Image.open(io.BytesIO(file_data))  # Create a BytesIO object from the file data
         extracted_text = pytesseract.image_to_string(image)
         
-        return jsonify({'extracted_text': extracted_text}), 200
+        return jsonify({extracted_text}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 from app import app
