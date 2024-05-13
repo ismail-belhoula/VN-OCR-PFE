@@ -1,4 +1,3 @@
-// CombinedScreen.js
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -13,8 +12,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as Camera from "expo-camera";
 import { useFocusEffect } from "@react-navigation/native";
+import { IconButton } from "react-native-paper"; // Import IconButton from react-native-
 
-export default function CombinedScreen() {
+export default function CombinedScreen({ navigation }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [text, setText] = useState("");
@@ -90,7 +90,7 @@ export default function CombinedScreen() {
       data: blob,
     });
 
-    let responsePost = await fetch("http://192.168.137.1:8080/extract_text", {
+    let responsePost = await fetch("http://192.168.0.10:8080/extract_text", {
       method: "POST",
       body: formData,
       headers: {
