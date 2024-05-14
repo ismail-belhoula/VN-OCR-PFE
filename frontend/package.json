@@ -12,6 +12,7 @@
     "@aws-amplify/react-native": "^1.1.0",
     "@expo/metro-runtime": "~3.1.3",
     "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/drawer": "^6.6.11",
     "@react-navigation/native": "^6.1.17",
@@ -22,6 +23,7 @@
     "dotenv": "^16.4.5",
     "expo": "~50.0.17",
     "expo-camera": "~14.1.3",
+    "expo-checkbox": "^3.0.0",
     "expo-constants": "~15.4.6",
     "expo-image-picker": "~14.7.1",
     "expo-status-bar": "~1.11.1",
@@ -42,7 +44,8 @@
     "react-native-vector-icons": "^10.0.3",
     "react-native-vision-camera": "^3.9.1",
     "react-native-web": "~0.19.6",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "expo-barcode-scanner": "~12.9.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

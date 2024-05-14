@@ -1,26 +1,46 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   Button,
-  TextInput,
   Image,
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Camera from "expo-camera";
-import { useFocusEffect } from "@react-navigation/native";
-import { IconButton } from "react-native-paper"; // Import IconButton from react-native-
+import { BarCodeScanner } from "expo-barcode-scanner";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
-export default function CombinedScreen({ navigation }) {
+const Stack = createStackNavigator();
+
+function HomeScreen({ navigation, route }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [text, setText] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [showText, setShowText] = useState(false); // Add a state variable to determine whether to show the text
-  const extractedTextRef = useRef(""); // Use a ref instead of a state
+  const [extractedText, setExtractedText] = useState(
+    route.params?.editedText || ""
+  );
+  const [barcodeData, setBarcodeData] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+
+  const scanBarcode = () => {
+    setScanned(false);
+    setIsScanning(true);
+  };
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    setIsScanning(false);
+    setBarcodeData(data);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+  };
+  const toggleScanning = () => {
+    setIsScanning(!isScanning);
+  };
 
   const selectImageFromCamera = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync();
@@ -35,8 +55,6 @@ export default function CombinedScreen({ navigation }) {
       aspect: [4, 3],
       quality: 0.5,
     });
-
-    console.log(result);
 
     if (!result.cancelled) {
       let uri = result.assets[0].uri;
@@ -59,8 +77,6 @@ export default function CombinedScreen({ navigation }) {
       quality: 0.5,
     });
 
-    console.log(result);
-
     if (!result.cancelled) {
       let uri = result.assets[0].uri;
       setImage(uri);
@@ -76,9 +92,26 @@ export default function CombinedScreen({ navigation }) {
 
     setLoading(true);
 
-    let responseFetch = await fetch(uri);
-    let blob = await responseFetch.blob();
+    // Replace the URL with your actual endpoint
+    let responseFetch = await fetch("http://192.168.0.3:8080/extract_text", {
+      method: "POST",
+      body: createFormData(uri),
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
+    let json = await responseFetch.json();
+    console.log(json);
+
+    setExtractedText(json.extracted_text);
+    setLoading(false);
+
+    // Navigate to Confirmation screen with extracted text
+    navigation.navigate("Confirmation", { extractedText: json.extracted_text });
+  };
+
+  const createFormData = (uri) => {
     let formData = new FormData();
     let uriParts = uri.split(".");
     let fileType = uriParts[uriParts.length - 1];
@@ -87,72 +120,27 @@ export default function CombinedScreen({ navigation }) {
       uri,
       name: `image.${fileType}`,
       type: `image/${fileType}`,
-      data: blob,
     });
 
-    let responsePost = await fetch("http://192.168.0.10:8080/extract_text", {
-      method: "POST",
-      body: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    let json = await responsePost.json();
-    console.log(json);
-    // extractedTextRef.current = json.extracted_text; // Update the ref instead of the state
-
-    setLoading(false);
-    if (json.extracted_text === "") {
-      alert("No text was detected,Please try again.");
-      setImage(null);
-      setText("");
-      setShowText(false);
-    } else {
-      setText(json.extracted_text);
-      setShowText(true);
-    }
+    return formData;
   };
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
 
-  const handleConfirm = () => {
-    setIsEditing(false);
-    console.log("Confirmed text:", text);
-  };
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      setImage(null);
-      setLoading(false);
-      setText("");
-      setShowText(false); // Don't show the text
-    }, [])
-  );
-
-  if (showText) {
-    // If showText is true, render the text screen
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        {isEditing ? (
-          <TextInput
-            value={text}
-            onChangeText={setText}
-            style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
-          />
-        ) : (
-          <Text>Extracted Text: {text}</Text>
-        )}
-        <Button title="Confirm" onPress={handleConfirm} />
-        <Button title="Edit" onPress={handleEdit} />
-      </View>
-    );
-  } else {
-    // If showText is false, render the camera screen
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.buttons}
           onPress={selectImageFromCamera}
@@ -165,13 +153,67 @@ export default function CombinedScreen({ navigation }) {
         >
           <Text>Upload a Photo</Text>
         </TouchableOpacity>
-        {image && (
-          <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-        )}
-        {loading && <ActivityIndicator size="large" color="#0000ff" />}
       </View>
-    );
-  }
+      <Text>This is the extracted text: {extractedText}</Text>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.buttons} onPress={scanBarcode}>
+          <Text>Scan Barcode</Text>
+        </TouchableOpacity>
+      </View>
+      {isScanning && (
+        <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
+      {scanned && (
+        <View style={{ marginTop: 20 }}>
+          <Image
+            source={{ uri: barcodeData }} // Assuming barcodeData holds the URI of the barcode image
+            style={{ width: 200, height: 200 }}
+          />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function ConfirmationScreen({ route, navigation }) {
+  const { extractedText } = route.params;
+  const [editedText, setEditedText] = useState(extractedText);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleConfirm = () => {
+    // Navigate back to HomeScreen with the edited text
+    navigation.navigate("Home", { editedText });
+  };
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      {isEditing ? (
+        <TextInput
+          value={editedText}
+          onChangeText={setEditedText}
+          style={styles.textInput}
+        />
+      ) : (
+        <Text style={styles.extractedText}>Extracted Text: {editedText}</Text>
+      )}
+      <View style={styles.buttonsContainer}>
+        <Button title="Edit" onPress={() => setIsEditing(true)} />
+        <Button title="Confirm" onPress={handleConfirm} />
+      </View>
+    </View>
+  );
+}
+
+export default function CombinedScreen() {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
+    </Stack.Navigator>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -197,7 +239,18 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 8,
   },
-  bn632HoverText: {
-    color: "#fff",
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  textInput: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderRadius: 20, // This will make the TextInput circular
   },
 });
