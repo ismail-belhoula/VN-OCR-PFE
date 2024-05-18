@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Input, Button } from "react-native-elements";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { ImageBackground } from "react-native";
 
 const auth = getAuth();
 
@@ -26,57 +27,63 @@ const SignInScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Sign In</Text>
-        <Text style={styles.subtitle}>Enter your credentials to sign in.</Text>
-        <View style={styles.formContainer}>
-          <Input
-            placeholder="Email"
-            containerStyle={{ marginTop: 10, width: 300 }}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            leftIcon={<Icon name="envelope" size={16} />}
-          />
+    <ImageBackground
+      source={require("../../assets/background2.jpg")}
+      style={styles.backgroundImage}
+    >
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.skipbutton}
+          onPress={() => navigation.navigate("Combined")}
+        >
+          <Text style={styles.confirmButtonText}>Skip</Text>
+        </TouchableOpacity>
+        <View style={styles.form}>
+          <View style={styles.formContainer}>
+            <Input
+              placeholder="Email"
+              containerStyle={{ marginTop: 10, width: 300 }}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              leftIcon={<Icon name="envelope" size={16} />}
+            />
 
-          <Input
-            placeholder="Password"
-            containerStyle={{ marginTop: 10, width: 300 }}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry={true}
-            leftIcon={<Icon name="key" size={16} />}
-          />
-          {<Text style={styles.error}>{validationMessage}</Text>}
+            <Input
+              placeholder="Password"
+              containerStyle={{ marginTop: 10, width: 300 }}
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
+              leftIcon={<Icon name="key" size={16} />}
+            />
+            {<Text style={styles.error}>{validationMessage}</Text>}
+          </View>
+          <View style={styles.formSection}>
+            <Text style={{ paddingBottom: 10 }}>
+              Don't have an account yet?{" "}
+              <Text
+                style={styles.formSectionLink}
+                onPress={() => navigation.navigate("Sign Up")}
+              >
+                Sign Up Here
+              </Text>
+            </Text>
+            <Text>
+              Forgot Your Password?{" "}
+              <Text
+                style={styles.formSectionLink}
+                onPress={() => navigation.navigate("Forgot Password")}
+              >
+                Reset it Here
+              </Text>
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.buttons} onPress={login}>
+            <Text style={styles.confirmButtonText}>Sign in</Text>
+          </TouchableOpacity>
         </View>
-        <Button title="Sign in" onPress={login} />
       </View>
-      <View style={styles.formSection}>
-        <Text>
-          Don't have an account yet?{" "}
-          <Text
-            style={styles.formSectionLink}
-            onPress={() => navigation.navigate("Sign Up")}
-          >
-            Sign Up Here
-          </Text>
-        </Text>
-        <Text>
-          Forgot Your Password?{" "}
-          <Text
-            style={styles.formSectionLink}
-            onPress={() => navigation.navigate("Forgot Password")}
-          >
-            Reset it Here
-          </Text>
-        </Text>
-      </View>
-      <Button
-        title="skip to OCR"
-        buttonStyle={{ marginTop: 200 }}
-        onPress={() => navigation.navigate("Combined")}
-      />
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -84,8 +91,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
-    marginTop: 40,
+    paddingTop: 80,
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover", // or 'stretch' or 'contain'
   },
   error: {
     marginTop: 10,
@@ -105,19 +115,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   subtitle: {
-    fontSize: 14,
-    color: "#666",
+    fontWeight: "bold",
+    fontSize: 20,
+    color: "#0099FF",
+    backgroundColor: "#fff",
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    width: "100%",
+    padding: 10,
+    textAlign: "center",
   },
   formContainer: {
     overflow: "hidden",
     borderRadius: 8,
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     marginVertical: 8,
     width: "100%",
     paddingHorizontal: 20,
     paddingTop: 20,
   },
   formSection: {
+    borderRadius: 8,
     padding: 16,
     fontSize: 12,
     backgroundColor: "#e0ecfb",
@@ -134,6 +153,65 @@ const styles = StyleSheet.create({
   formSectionLink: {
     fontWeight: "bold",
     color: "#0066ff",
+  },
+  buttons: {
+    alignSelf: "center",
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 200,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    margin: 20,
+    height: 55,
+    textAlign: "center",
+    backgroundColor: "#FFF",
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#4184ea",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  skipbutton: {
+    margin: 5,
+    marginBottom: 100,
+    alignSelf: "flex-end",
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 100,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    marginTop: 1,
+    height: 55,
+    textAlign: "center",
+    backgroundColor: "#FFF",
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#4184ea",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  confirmButtonText: {
+    color: "#0099FF",
+    fontSize: 13,
+    fontWeight: "bold",
+    padding: "10",
+    alignSelf: "center",
   },
 });
 

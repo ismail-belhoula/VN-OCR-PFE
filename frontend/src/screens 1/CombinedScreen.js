@@ -2,19 +2,23 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   Image,
-  ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from "react-native";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as Camera from "expo-camera";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Checkbox from "expo-checkbox"; // You may need to install expo-checkbox
+import {
+  saveDataToFirestore,
+  uploadPhoto,
+} from "../../config/firebaseFunctions";
+// adjust the import path as necessary
 
 const Stack = createStackNavigator();
 
@@ -36,6 +40,28 @@ function HomeScreen({ navigation, route }) {
   const [checked2, setChecked2] = useState(false);
   const [checked3, setChecked3] = useState(false);
 
+  const [bdcolor, setbdcolor] = useState("#0099FF");
+  const [bdcolor2, setbdcolor2] = useState("#0099FF");
+  const [bdcolor3, setbdcolor3] = useState("#0099FF");
+
+  const [bbcolor, setbbcolor] = useState("#0099FF");
+  const [bcolor2, setbbcolor2] = useState("#0099FF");
+  const [bbcolor3, setbbcolor3] = useState("#0099FF");
+  const [cbcolor, setcbcolor] = useState("#0099FF");
+
+  const changeBackgroundColorToLightGreen = () => {
+    setbdcolor("#90EE90"); // Light green color code
+  };
+  const changeBackgroundColorToLightGreen2 = () => {
+    setbdcolor2("#90EE90"); // Light green color code
+  };
+  const changeBackgroundColorToLightGreen3 = () => {
+    setbdcolor3("#90EE90"); // Light green color code
+  };
+  const changeConfirmButtonColorToLightGreen = () => {
+    setbdcolor3("#90EE90"); // Light green color code
+  };
+
   const scanBarcode = () => {
     setScanned(false);
     setIsScanning(true);
@@ -45,6 +71,7 @@ function HomeScreen({ navigation, route }) {
     setIsScanning(false);
     setBarcodeData(data);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    changeBackgroundColorToLightGreen2();
   };
   const toggleScanning = () => {
     setIsScanning(!isScanning);
@@ -113,6 +140,15 @@ function HomeScreen({ navigation, route }) {
     }
   };
 
+  const handleAllChecked = () => {
+    if (checked1 && checked2 && checked3) {
+      changeBackgroundColorToLightGreen3();
+    }
+  };
+  useEffect(() => {
+    handleAllChecked();
+  }, [checked1, checked2, checked3]);
+
   const uploadImage = async (uri) => {
     if (!uri) {
       console.log("No URI provided");
@@ -122,7 +158,7 @@ function HomeScreen({ navigation, route }) {
     setLoading(true);
 
     // Replace the URL with your actual endpoint
-    let responseFetch = await fetch("http://192.168.0.5:8080/extract_text", {
+    let responseFetch = await fetch("http://192.168.0.4:8080/extract_text", {
       method: "POST",
       body: createFormData(uri),
       headers: {
@@ -135,6 +171,7 @@ function HomeScreen({ navigation, route }) {
 
     setExtractedText(json.extracted_text);
     setLoading(false);
+    changeBackgroundColorToLightGreen();
 
     // Navigate to Confirmation screen with extracted text
     navigation.navigate("Confirmation", { extractedText: json.extracted_text });
@@ -153,6 +190,22 @@ function HomeScreen({ navigation, route }) {
 
     return formData;
   };
+
+  const handleConfirmData = async () => {
+    // Upload images
+    const photoUrls = await Promise.all([
+      uploadPhoto(image1, "photo1.jpg"),
+      uploadPhoto(image2, "photo2.jpg"),
+      uploadPhoto(image3, "photo3.jpg"),
+    ]);
+
+    // Save extracted text and barcode
+    await saveDataToFirestore(extractedText, barcodeData);
+
+    alert("Data saved successfully!");
+    console.log("Data saved successfully!");
+  };
+
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -168,91 +221,194 @@ function HomeScreen({ navigation, route }) {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "flex-start",
-        paddingBottom: 30,
-      }}
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, backgroundColor: "lightblue" }}
     >
-      <Text style={{ alignItems: "flex-start", justifyContent: "flex-start" }}>
-        Take a photo of the product nutation table :{" "}
-      </Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.buttons}
-          onPress={selectImageFromCamera}
+      <View style={{ justifyContent: "center", alignContent: "center" }}>
+        <View
+          style={[
+            styles.box,
+            {
+              backgroundColor: "#FFF",
+              overflow: "hidden",
+              borderRadius: 50,
+              marginVertical: 10,
+              marginHorizontal: 7,
+              width: "97%",
+              paddingHorizontal: 20,
+              paddingTop: 20,
+              borderWidth: 3, // Border width
+              borderColor: bdcolor, // Border color
+              borderRadius: 50, // Border radius
+            },
+          ]}
         >
-          <Text>Take a Photo</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttons}
-          onPress={selectImageFromGallery}
+          <Text
+            style={{
+              alignItems: "flex-start",
+              justifyContent: "flex-start",
+            }}
+          >
+            Take/Upload a photo of the product nutation table :
+          </Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.buttons}
+              onPress={selectImageFromCamera}
+            >
+              <Text style={styles.confirmButtonText}>Take a Photo</Text>
+              <MaterialIcons name="add-a-photo" size={24} color="#0099FF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.buttons}
+              onPress={selectImageFromGallery}
+            >
+              <Text style={styles.confirmButtonText}>Upload a Photo</Text>
+              <MaterialIcons
+                name="add-photo-alternate"
+                size={24}
+                color="#0099FF"
+              />
+            </TouchableOpacity>
+          </View>
+          <Text>This is the extracted text: </Text>
+          <Text
+            style={{
+              alignSelf: "center",
+              paddingTop: 20,
+            }}
+          >
+            {extractedText}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.box,
+            {
+              backgroundColor: "#FFF",
+              overflow: "hidden",
+              borderRadius: 50,
+              marginVertical: 10,
+              marginHorizontal: 7,
+              width: "97%",
+              paddingHorizontal: 20,
+              paddingTop: 20,
+              borderWidth: 3, // Border width
+              borderColor: bdcolor2, // Border color
+              borderRadius: 50, // Border radius
+            },
+          ]}
         >
-          <Text>Upload a Photo</Text>
-        </TouchableOpacity>
-      </View>
-      <Text>This is the extracted text: {extractedText}</Text>
-      <Text>Scan the product's Barcode :</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.buttons} onPress={scanBarcode}>
-          <Text>Scan Barcode</Text>
-        </TouchableOpacity>
-      </View>
-      <Text>this is the extracted Barcode :{barcodeData}</Text>
-      {isScanning && (
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
-        />
-      )}
-      {scanned}
-      <View style={styles.photoButtonContainer}>
-        <View style={styles.photoButtonWrapper}>
-          <TouchableOpacity
-            style={styles.buttons2}
-            onPress={() => selectImage(setImage1, setChecked1)}
-          >
-            <Text>Take Photo 1</Text>
-          </TouchableOpacity>
-          <Checkbox
-            style={styles.checkbox}
-            value={checked1}
-            onValueChange={setChecked1}
-          />
-          {image1 && <Image source={{ uri: image1 }} style={styles.image} />}
+          <Text>Scan the product's Barcode :</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.buttons} onPress={scanBarcode}>
+              <Text style={styles.confirmButtonText}>Scan Barcode</Text>
+              <MaterialCommunityIcons
+                name="barcode-scan"
+                size={24}
+                color="#0099FF"
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={{ paddingBottom: 10 }}>
+            this is the extracted Barcode :{barcodeData}
+          </Text>
+          {isScanning && (
+            <BarCodeScanner
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+              style={StyleSheet.absoluteFillObject}
+            />
+          )}
+          {scanned}
         </View>
-        <View style={styles.photoButtonWrapper}>
-          <TouchableOpacity
-            style={styles.buttons2}
-            onPress={() => selectImage(setImage2, setChecked2)}
-          >
-            <Text>Take Photo 2</Text>
-          </TouchableOpacity>
-          <Checkbox
-            style={styles.checkbox}
-            value={checked2}
-            onValueChange={setChecked2}
-          />
-          {image2 && <Image source={{ uri: image2 }} style={styles.image} />}
+        <View
+          style={[
+            styles.box,
+            {
+              backgroundColor: "#FFF",
+              overflow: "hidden",
+              borderRadius: 50,
+              marginVertical: 10,
+              marginHorizontal: 7,
+              width: "97%",
+              paddingHorizontal: 20,
+              paddingTop: 10,
+              borderWidth: 3, // Border width
+              borderColor: bdcolor3, // Border color
+              borderRadius: 50, // Border radius
+            },
+          ]}
+        >
+          <View style={styles.photoButtonContainer}>
+            <View style={styles.photoButtonWrapper}>
+              <TouchableOpacity
+                style={styles.buttons2}
+                onPress={() => selectImage(setImage1, setChecked1)}
+              >
+                <Text style={styles.confirmButtonText}>Take Photo 1</Text>
+              </TouchableOpacity>
+              <Checkbox
+                style={styles.checkbox}
+                value={checked1}
+                onValueChange={setChecked1}
+              />
+              {image1 && (
+                <Image source={{ uri: image1 }} style={styles.image} />
+              )}
+            </View>
+            <View style={styles.photoButtonWrapper}>
+              <TouchableOpacity
+                style={styles.buttons2}
+                onPress={() => selectImage(setImage2, setChecked2)}
+              >
+                <Text style={styles.confirmButtonText}>Take Photo 2</Text>
+              </TouchableOpacity>
+              <Checkbox
+                style={styles.checkbox}
+                value={checked2}
+                onValueChange={setChecked2}
+              />
+              {image2 && (
+                <Image source={{ uri: image2 }} style={styles.image} />
+              )}
+            </View>
+            <View style={styles.photoButtonWrapper}>
+              <TouchableOpacity
+                style={styles.buttons2}
+                onPress={() => selectImage(setImage3, setChecked3)}
+              >
+                <Text style={styles.confirmButtonText}>Take Photo 3</Text>
+              </TouchableOpacity>
+              <Checkbox
+                style={styles.checkbox}
+                value={checked3}
+                onValueChange={setChecked3}
+              />
+              {image3 && (
+                <Image source={{ uri: image3 }} style={styles.image} />
+              )}
+            </View>
+          </View>
         </View>
-        <View style={styles.photoButtonWrapper}>
+        {/* Confirm Button */}
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "flex-end",
+            marginTop: "auto",
+            paddingTop: 30,
+            paddingBottom: 20,
+          }}
+        >
           <TouchableOpacity
-            style={styles.buttons2}
-            onPress={() => selectImage(setImage3, setChecked3)}
+            style={styles.confirmButton}
+            onPress={handleConfirmData}
           >
-            <Text>Take Photo 3</Text>
+            <Text style={styles.confirmButtonText}>Confirm</Text>
           </TouchableOpacity>
-          <Checkbox
-            style={styles.checkbox}
-            value={checked3}
-            onValueChange={setChecked3}
-          />
-          {image3 && <Image source={{ uri: image3 }} style={styles.image} />}
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -267,7 +423,24 @@ function ConfirmationScreen({ route, navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={[
+        styles.box,
+        {
+          backgroundColor: "#FFF",
+          overflow: "hidden",
+          borderRadius: 50,
+          marginVertical: 10,
+          marginHorizontal: 7,
+          width: "97%",
+          paddingHorizontal: 20,
+          paddingTop: 10,
+          borderWidth: 3, // Border width
+          borderColor: "#0099FF", // Border color
+          borderRadius: 50, // Border radius
+        },
+      ]}
+    >
       {isEditing ? (
         <TextInput
           value={editedText}
@@ -275,11 +448,22 @@ function ConfirmationScreen({ route, navigation }) {
           style={styles.textInput}
         />
       ) : (
-        <Text style={styles.extractedText}>Extracted Text: {editedText}</Text>
+        <View>
+          <Text>Extracted Text:</Text>
+          <Text style={styles.extractedText}> {editedText}</Text>
+        </View>
       )}
-      <View style={styles.buttonsContainer}>
-        <Button title="Edit" onPress={() => setIsEditing(true)} />
-        <Button title="Confirm" onPress={handleConfirm} />
+      <View style={styles.buttonContainer2}>
+        <TouchableOpacity
+          style={styles.confirmButton2}
+          onPress={() => setIsEditing(true)}
+        >
+          <Text style={styles.confirmButtonText}>Edit</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.confirmButton2} onPress={handleConfirm}>
+          <Text style={styles.confirmButtonText}>Confirm</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -288,24 +472,35 @@ function ConfirmationScreen({ route, navigation }) {
 export default function CombinedScreen() {
   return (
     <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Confirmation"
+        component={ConfirmationScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
   buttons: {
-    width: 160,
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 150,
     fontSize: 16,
     fontWeight: "600",
     color: "#fff",
     margin: 20,
     height: 55,
     textAlign: "center",
-    borderRadius: 50,
+    backgroundColor: "#FFF",
     overflow: "hidden",
-    backgroundColor: "#25aae1",
+
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#4184ea",
@@ -318,16 +513,66 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttons2: {
-    width: 100,
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 115,
     fontSize: 16,
     fontWeight: "600",
     color: "#fff",
-    margin: 20,
+    margin: 10,
     height: 55,
     textAlign: "center",
-    borderRadius: 50,
     overflow: "hidden",
-    backgroundColor: "#25aae1",
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#4184ea",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  buttons: {
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 115,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    margin: 10,
+    height: 55,
+    textAlign: "center",
+    overflow: "hidden",
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#4184ea",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  buttons4: {
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 115,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    margin: 10,
+    height: 55,
+    textAlign: "center",
+    overflow: "hidden",
+    backgroundColor: "#FFF",
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#4184ea",
@@ -343,7 +588,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     width: "100%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
+  },
+  buttonContainer2: {
+    flexDirection: "row",
+    width: "100%",
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    justifyContent: "space-around",
   },
   textInput: {
     height: 40,
@@ -368,19 +620,59 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     marginTop: 10,
+    marginBottom: 20,
   },
   image: {
-    width: 100,
-    height: 100,
-    marginTop: 10,
+    width: 110,
+    height: 110,
+    margin: 10,
   },
   extractedText: {
     fontSize: 16,
     marginBottom: 20,
+    alignSelf: "center",
+    paddingTop: 20,
   },
   buttonsContainer2: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+  },
+  confirmButton: {
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 10, // Border radiuse
+    backgroundColor: "#25aae1",
+    padding: 15,
+    borderRadius: 50,
+    marginTop: "auto",
+    justifyContent: "center",
+    alignSelf: "center",
+    paddingTop: 10,
+    paddingBottom: 10,
+    marginTop: 10,
+    backgroundColor: "#FFF",
+    width: 150,
+  },
+  confirmButton2: {
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 10, // Border radiuse
+    backgroundColor: "#25aae1",
+    padding: 15,
+    borderRadius: 50,
+    marginTop: "auto",
+    justifyContent: "center",
+    alignSelf: "center",
+    paddingTop: 10,
+    width: 150,
+    backgroundColor: "#FFF",
+  },
+  confirmButtonText: {
+    color: "#0099FF",
+    fontSize: 13,
+    fontWeight: "bold",
+    padding: "10",
+    alignSelf: "center",
   },
 });

@@ -9,21 +9,35 @@ export default function HomeScreen({ navigation }) {
   const { user } = useAuthentication();
   return (
     <View style={styles.container}>
-      <Text>Welcome {user?.email}!</Text>
-      <TouchableOpacity style={styles.buttons} onPress={() => signOut(auth)}>
-        <Text>Sign Out</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.buttons}
-        onPress={() => navigation.navigate("Combined")}
-      >
-        <Text>Use OCR</Text>
-      </TouchableOpacity>
+      <Text>Welcome {user?.email} !</Text>
+      <View style={styles.photoButtonContainer}>
+        <TouchableOpacity
+          style={styles.confirmButton2}
+          onPress={() => signOut(auth)}
+        >
+          <Text style={styles.confirmButtonText}>Sign Out</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.confirmButton2}
+          onPress={() => navigation.navigate("Combined")}
+        >
+          <Text style={styles.confirmButtonText}>Use OCR</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  photoButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+
+    paddingVertical: 30,
+    marginTop: 0,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -54,5 +68,27 @@ const styles = StyleSheet.create({
   },
   bn632HoverText: {
     color: "#fff",
+  },
+  confirmButton2: {
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 10, // Border radiuse
+    backgroundColor: "#25aae1",
+    padding: 15,
+    borderRadius: 50,
+    marginTop: "auto",
+    justifyContent: "center",
+    alignSelf: "center",
+    paddingTop: 10,
+    width: 150,
+    backgroundColor: "#FFF",
+    marginHorizontal: 10,
+  },
+  confirmButtonText: {
+    color: "#0099FF",
+    fontSize: 13,
+    fontWeight: "bold",
+    padding: "10",
+    alignSelf: "center",
   },
 });
