@@ -28,7 +28,7 @@ const SignInScreen = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/background2.jpg")}
+      source={require("../../assets/background.jpg")}
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
@@ -42,19 +42,21 @@ const SignInScreen = ({ navigation }) => {
           <View style={styles.formContainer}>
             <Input
               placeholder="Email"
+              placeholderTextColor={"#0099FF"}
               containerStyle={{ marginTop: 10, width: 300 }}
               value={email}
               onChangeText={(text) => setEmail(text)}
-              leftIcon={<Icon name="envelope" size={16} />}
+              leftIcon={<Icon name="envelope" color="#0099FF" size={16} />}
             />
 
             <Input
               placeholder="Password"
+              placeholderTextColor={"#0099FF"}
               containerStyle={{ marginTop: 10, width: 300 }}
               value={password}
               onChangeText={(text) => setPassword(text)}
               secureTextEntry={true}
-              leftIcon={<Icon name="key" size={16} />}
+              leftIcon={<Icon name="key" color="#0099FF" size={16} />}
             />
             {<Text style={styles.error}>{validationMessage}</Text>}
           </View>
@@ -104,8 +106,8 @@ const styles = StyleSheet.create({
   form: {
     position: "relative",
     flexDirection: "column",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     gap: 10,
     justifyContent: "center",
     alignContent: "center",
@@ -127,6 +129,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   formContainer: {
+    borderWidth: 3,
+    borderColor: "#0099FF",
     overflow: "hidden",
     borderRadius: 8,
     backgroundColor: "rgba(255, 255, 255, 0.85)",
@@ -136,10 +140,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   formSection: {
+    borderWidth: 3,
+    borderColor: "#0099FF",
     borderRadius: 8,
     padding: 16,
+    paddingTop: 20,
     fontSize: 12,
-    backgroundColor: "#e0ecfb",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     shadowColor: "#000",
     justifyContent: "center",
     alignContent: "center",

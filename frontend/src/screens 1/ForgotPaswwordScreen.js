@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Input, Button } from "react-native-elements";
+import Input from "react-native-elements";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { ImageBackground } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const auth = getAuth();
 
@@ -40,38 +42,75 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password?</Text>
-      <Text style={styles.subtitle}>
-        Enter your email address below to receive a password reset link.
-      </Text>
-      <Input
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-        containerStyle={styles.inputContainer}
-      />
-      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-      {resetSuccess ? (
-        <Text style={styles.success}>
-          Password reset email sent successfully!
+    <ImageBackground
+      source={require("../../assets/background.jpg")}
+      style={styles.backgroundImage}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Forgot Password?</Text>
+        <Text style={styles.subtitle}>
+          Enter your email address below to receive a password reset link.
         </Text>
-      ) : null}
+        <View style={styles.form}>
+          <View style={styles.formContainer}>
+            <Input
+              placeholder="Email"
+              placeholderTextColor={"#0099FF"}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+              containerStyle={{ marginTop: 10, width: 350 }}
+              leftIcon={<Icon name="envelope" color="#0099FF" size={16} />}
+            />
+            {errorMessage ? (
+              <Text style={styles.error}>{errorMessage}</Text>
+            ) : null}
+            {resetSuccess ? (
+              <Text style={styles.success}>
+                Password reset email sent successfully!
+              </Text>
+            ) : null}
+          </View>
+        </View>
 
-      <TouchableOpacity style={styles.buttons} onPress={handleResetPassword}>
-        <Text style={styles.buttonText}>Reset Password</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.buttons}
-        onPress={() => navigation.navigate("Sign In")}
-      >
-        <Text style={styles.buttonText}>Sign In Here</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.buttons} onPress={handleResetPassword}>
+          <Text style={styles.buttonText}>Reset Password</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttons}
+          onPress={() => navigation.navigate("Sign In")}
+        >
+          <Text style={styles.buttonText}>Sign In Here</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  formContainer: {
+    borderWidth: 3,
+    borderColor: "#0099FF",
+    overflow: "hidden",
+    borderRadius: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    marginVertical: 8,
+    width: "100%",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  form: {
+    position: "relative",
+    flexDirection: "column",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    gap: 10,
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: "cover", // or 'stretch' or 'contain'
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -79,13 +118,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderWidth: 3,
+    borderColor: "#0099FF",
     fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 20,
+    color: "#0099FF",
+    backgroundColor: "#fff",
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    width: "100%",
+    padding: 10,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
+    paddingBottom: 40,
+    paddingTop: 40,
+    marginTop: 40,
+    borderWidth: 3,
+    borderColor: "#0099FF",
+    fontWeight: "bold",
+    fontSize: 20,
+    color: "#0099FF",
+    backgroundColor: "#fff",
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    width: "100%",
+    padding: 10,
     textAlign: "center",
   },
   inputContainer: {
@@ -94,23 +156,26 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
-    marginBottom: 10,
+    marginBottom: 30,
   },
   success: {
     color: "green",
-    marginBottom: 10,
+    marginBottom: 30,
   },
   buttons: {
-    width: 160,
+    alignSelf: "center",
+    borderWidth: 2, // Border width
+    borderColor: "#0099FF", // Border color
+    borderRadius: 50, // Border radius
+    width: 200,
     fontSize: 16,
     fontWeight: "600",
     color: "#fff",
     margin: 20,
     height: 55,
     textAlign: "center",
-    borderRadius: 50,
+    backgroundColor: "#FFF",
     overflow: "hidden",
-    backgroundColor: "#25aae1",
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#4184ea",
@@ -123,7 +188,11 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttonText: {
-    color: "#fff",
+    color: "#0099FF",
+    fontSize: 13,
+    fontWeight: "bold",
+    padding: "10",
+    alignSelf: "center",
   },
 });
 

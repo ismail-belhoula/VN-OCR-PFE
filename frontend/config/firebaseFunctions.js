@@ -2,12 +2,12 @@
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "./firebase"; // adjust the import path as necessary
-
-const saveDataToFirestore = async (text, barcode) => {
+const saveDataToFirestore = async (text, barcode, email) => {
   try {
     const docRef = await addDoc(collection(db, "extractedData"), {
       text: text,
       barcode: barcode,
+      email: email,
       timestamp: new Date(),
     });
     console.log("Document written with ID: ", docRef.id);
