@@ -2,6 +2,8 @@
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "./firebase"; // adjust the import path as necessary
+import uuid from "react-native-uuid";
+
 const saveDataToFirestore = async (text, barcode, email) => {
   try {
     const docRef = await addDoc(collection(db, "extractedData"), {
@@ -16,10 +18,11 @@ const saveDataToFirestore = async (text, barcode, email) => {
   }
 };
 
-const uploadPhoto = async (photoUri, photoName) => {
+const uploadPhoto = async (photoUri) => {
   const response = await fetch(photoUri);
   const blob = await response.blob();
-  const storageRef = ref(storage, `photos/${photoName}`);
+  const uniqueFilename = `${uuid.v4()}_${Date.now()}.jpg`;
+  const storageRef = ref(storage, `photos/${uniqueFilename}`);
 
   try {
     const snapshot = await uploadBytes(storageRef, blob);
