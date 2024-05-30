@@ -196,9 +196,9 @@ function MainScreen({ navigation, route }) {
   const handleConfirmData = async () => {
     // Upload images
     const photoUrls = await Promise.all([
-      uploadPhoto(image1),
-      uploadPhoto(image2),
-      uploadPhoto(image3),
+      uploadPhoto(image1, "photo1.jpg"),
+      uploadPhoto(image2, "photo2.jpg"),
+      uploadPhoto(image3, "photo3.jpg"),
     ]);
 
     // Save extracted text and barcode
