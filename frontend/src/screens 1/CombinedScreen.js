@@ -28,6 +28,7 @@ function MainScreen({ navigation, route }) {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const editedText = route.params?.editedText;
+  const ResetBarCodeData = route.params?.ResetBarCodeData;
   const [extractedText, setExtractedText] = useState("");
   const barcodeData = route.params?.barcodeData || "";
   const [hasPermission, setHasPermission] = useState(null);
@@ -59,9 +60,6 @@ function MainScreen({ navigation, route }) {
   const changeBackgroundColorToLightGreen3 = () => {
     setbdcolor3("#90EE90"); // Light green color code
   };
-  const changeConfirmButtonColorToLightGreen = () => {
-    setbdcolor3("#90EE90"); // Light green color code
-  };
 
   const { user } = useAuthentication();
   const useremail = user?.email;
@@ -72,13 +70,6 @@ function MainScreen({ navigation, route }) {
     });
   };
 
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    setIsScanning(false);
-    setBarcodeData(data);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    changeBackgroundColorToLightGreen2();
-  };
   const toggleScanning = () => {
     setIsScanning(!isScanning);
   };
@@ -167,7 +158,7 @@ function MainScreen({ navigation, route }) {
       return;
     }
     setLoading(true);
-    let responseFetch = await fetch("http://192.168.0.8:8080/extract_text", {
+    let responseFetch = await fetch("http://192.168.1.16:8080/extract_text", {
       method: "POST",
       body: createFormData(uri),
       headers: {
@@ -210,8 +201,6 @@ function MainScreen({ navigation, route }) {
       uploadPhoto(image3),
     ]);
 
-    console.log("Photo URLs: ", photoUrls);
-
     // Save extracted text and barcode
     await saveDataToFirestore(extractedText, barcodeData, useremail);
 
@@ -242,23 +231,25 @@ function MainScreen({ navigation, route }) {
         style={styles.backgroundImage}
       >
         <View style={{ justifyContent: "center", alignContent: "center" }}>
-          <View
-            style={[
-              styles.box,
-              {
-                backgroundColor: "rgba(255, 255, 255, 0.85)",
-                overflow: "hidden",
-                borderRadius: 50,
-                marginVertical: 10,
-                marginHorizontal: 7,
-                width: "97%",
-                paddingHorizontal: 20,
-                borderWidth: 5, // Border width
-                borderColor: bdcolor, // Border color
-                borderRadius: 50, // Border radius
-              },
-            ]}
-          >
+          <View style={[styles.box, styles.Views, { borderColor: bdcolor2 }]}>
+            <Text style={styles.subtitle}>Scan the product's Barcode :</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.buttons} onPress={scanBarcode}>
+                <Text style={styles.confirmButtonText}>Scan Barcode</Text>
+                <MaterialCommunityIcons
+                  name="barcode-scan"
+                  size={24}
+                  color="#0099FF"
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.form}>
+              <Text style={{ paddingBottom: 40 }}>
+                this is the extracted Barcode :{barcodeData}
+              </Text>
+            </View>
+          </View>
+          <View style={[styles.box, styles.Views, { borderColor: bdcolor }]}>
             <Text style={styles.subtitle}>
               Take/Upload a photo of the product nutation table :
             </Text>
@@ -300,60 +291,7 @@ function MainScreen({ navigation, route }) {
               </Text>
             </View>
           </View>
-          <View
-            style={[
-              styles.box,
-              {
-                justifyContent: "center",
-                flex: 1,
-                backgroundColor: "rgba(255, 255, 255, 0.85)",
-                overflow: "hidden",
-                borderRadius: 50,
-                marginVertical: 10,
-                marginHorizontal: 7,
-                width: "97%",
-                paddingHorizontal: 20,
-                borderWidth: 5, // Border width
-                borderColor: bdcolor2, // Border color
-                borderRadius: 50, // Border radius
-              },
-            ]}
-          >
-            <Text style={styles.subtitle}>Scan the product's Barcode :</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.buttons} onPress={scanBarcode}>
-                <Text style={styles.confirmButtonText}>Scan Barcode</Text>
-                <MaterialCommunityIcons
-                  name="barcode-scan"
-                  size={24}
-                  color="#0099FF"
-                />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.form}>
-              <Text style={{ paddingBottom: 40 }}>
-                this is the extracted Barcode :{barcodeData}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={[
-              styles.box,
-              {
-                backgroundColor: "rgba(255, 255, 255, 0.85)",
-                overflow: "hidden",
-                borderRadius: 50,
-                marginVertical: 10,
-                marginHorizontal: 7,
-                width: "97%",
-                paddingHorizontal: 20,
-                paddingTop: 10,
-                borderWidth: 5, // Border width
-                borderColor: bdcolor3, // Border color
-                borderRadius: 50, // Border radius
-              },
-            ]}
-          >
+          <View style={[styles.box, styles.Views, { borderColor: bdcolor3 }]}>
             <Text style={styles.subtitle}>
               Take different angle photos of the product:
             </Text>
@@ -408,7 +346,6 @@ function MainScreen({ navigation, route }) {
               </View>
             </View>
           </View>
-          {/* Confirm Button */}
           <View
             style={{
               alignItems: "center",
@@ -437,7 +374,6 @@ function ConfirmationScreen({ route, navigation }) {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleConfirm = () => {
-    // Navigate back to HomeScreen with the edited text
     navigation.navigate("Main", { editedText });
   };
 
@@ -485,14 +421,14 @@ function ConfirmationScreen({ route, navigation }) {
           )}
           <View style={styles.buttonContainer2}>
             <TouchableOpacity
-              style={styles.confirmButton2}
+              style={styles.confirmButton}
               onPress={() => setIsEditing(true)}
             >
               <Text style={styles.confirmButtonText}>Edit</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.confirmButton2}
+              style={styles.confirmButton}
               onPress={handleConfirm}
             >
               <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -508,6 +444,7 @@ function ScanBarcodeScreen({ navigation, route }) {
   const [scanned, setScanned] = useState(false);
   const [barcodeData, setBarcodeData] = useState("");
   const { onConfirm } = route.params;
+  const { handleResetData } = route.params;
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
@@ -536,9 +473,9 @@ function ScanBarcodeScreen({ navigation, route }) {
               width: "97%",
               paddingHorizontal: 20,
               paddingTop: 10,
-              borderWidth: 3, // Border width
-              borderColor: "#0099FF", // Border color
-              borderRadius: 50, // Border radius
+              borderWidth: 3,
+              borderColor: "#0099FF",
+              borderRadius: 50,
             },
           ]}
         >
@@ -556,16 +493,15 @@ function ScanBarcodeScreen({ navigation, route }) {
           )}
           <View style={styles.buttonContainer2}>
             <TouchableOpacity
-              style={styles.confirmButton2}
+              style={styles.confirmButton}
               onPress={() => setScanned(false)}
             >
               <Text style={styles.confirmButtonText}>Scan Again</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.confirmButton2}
+              style={styles.confirmButton}
               onPress={() => {
                 navigation.navigate("Main", { barcodeData });
-                onConfirm();
               }}
             >
               <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -586,10 +522,9 @@ function ScanBarcodeScreen({ navigation, route }) {
                 bottom: 0,
                 borderColor: "#0099FF",
                 borderWidth: 20,
-                borderRadius: 50, // Add your desired border radius here
+                borderRadius: 50,
               },
             ]}
-            f
           />
         )}
       </ImageBackground>
@@ -620,6 +555,19 @@ export default function CombinedScreen() {
 }
 
 const styles = StyleSheet.create({
+  Views: {
+    justifyContent: "center",
+    flex: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    overflow: "hidden",
+    borderRadius: 50,
+    marginVertical: 10,
+    marginHorizontal: 7,
+    width: "97%",
+    paddingHorizontal: 20,
+    borderWidth: 5,
+    borderRadius: 50,
+  },
   form: {
     marginBottom: 20,
     paddingTop: 40,
@@ -650,12 +598,12 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    resizeMode: "cover", // or 'stretch' or 'contain'
+    resizeMode: "cover",
   },
   buttons: {
-    borderWidth: 2, // Border width
-    borderColor: "#0099FF", // Border color
-    borderRadius: 50, // Border radius
+    borderWidth: 2,
+    borderColor: "#0099FF",
+    borderRadius: 50,
     width: 150,
     fontSize: 16,
     fontWeight: "600",
@@ -678,57 +626,9 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   buttons2: {
-    borderWidth: 2, // Border width
-    borderColor: "#0099FF", // Border color
-    borderRadius: 50, // Border radius
-    width: 115,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-    margin: 10,
-    height: 55,
-    textAlign: "center",
-    overflow: "hidden",
-    backgroundColor: "#FFF",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#4184ea",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.75,
-    shadowRadius: 15,
-    elevation: 8,
-  },
-  buttons: {
-    borderWidth: 2, // Border width
-    borderColor: "#0099FF", // Border color
-    borderRadius: 50, // Border radius
-    width: 115,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
-    margin: 10,
-    height: 55,
-    textAlign: "center",
-    overflow: "hidden",
-    backgroundColor: "#FFF",
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#4184ea",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.75,
-    shadowRadius: 15,
-    elevation: 8,
-  },
-  buttons4: {
-    borderWidth: 2, // Border width
-    borderColor: "#0099FF", // Border color
-    borderRadius: 50, // Border radius
+    borderWidth: 2,
+    borderColor: "#0099FF",
+    borderRadius: 50,
     width: 115,
     fontSize: 16,
     fontWeight: "600",
@@ -773,7 +673,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     paddingLeft: 10,
     paddingRight: 10,
-    borderRadius: 20, // This will make the TextInput circular
+    borderRadius: 20,
   },
   photoButtonContainer: {
     flexDirection: "row",
@@ -829,24 +729,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignSelf: "center",
     paddingTop: 10,
-    paddingBottom: 10,
-    marginTop: 10,
     backgroundColor: "#FFF",
     width: 150,
-  },
-  confirmButton2: {
-    borderWidth: 2, // Border width
-    borderColor: "#0099FF", // Border color
-    borderRadius: 10, // Border radiuse
-    backgroundColor: "#25aae1",
-    padding: 15,
-    borderRadius: 50,
-    marginTop: "auto",
-    justifyContent: "center",
-    alignSelf: "center",
-    paddingTop: 10,
-    width: 150,
-    backgroundColor: "#FFF",
   },
   confirmButtonText: {
     color: "#0099FF",

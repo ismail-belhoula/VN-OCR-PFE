@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Input from "react-native-elements";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { ImageBackground } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 const auth = getAuth();
 
@@ -59,7 +58,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
               value={email}
               onChangeText={(text) => setEmail(text)}
               containerStyle={{ marginTop: 10, width: 350 }}
-              leftIcon={<Icon name="envelope" color="#0099FF" size={16} />}
             />
             {errorMessage ? (
               <Text style={styles.error}>{errorMessage}</Text>

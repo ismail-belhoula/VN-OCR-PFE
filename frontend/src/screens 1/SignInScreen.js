@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Input, Button } from "react-native-elements";
+import { Input } from "react-native-elements";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { ImageBackground } from "react-native";
 
@@ -22,7 +22,7 @@ const SignInScreen = ({ navigation }) => {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       setValidationMessage(error.message);
-      console.error(error); // Log the error
+      console.error(error);
     }
   }
 
@@ -34,7 +34,7 @@ const SignInScreen = ({ navigation }) => {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.skipbutton}
-          onPress={() => navigation.navigate("Combined")}
+          onPress={() => navigation.navigate("Home")}
         >
           <Text style={styles.confirmButtonText}>Skip</Text>
         </TouchableOpacity>

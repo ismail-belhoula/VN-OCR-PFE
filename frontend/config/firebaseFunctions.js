@@ -6,6 +6,9 @@ import uuid from "react-native-uuid";
 
 const saveDataToFirestore = async (text, barcode, email) => {
   try {
+    if (!email) {
+      email = "Unknown";
+    }
     const docRef = await addDoc(collection(db, "extractedData"), {
       text: text,
       barcode: barcode,
