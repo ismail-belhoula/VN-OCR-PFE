@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import Input from "react-native-elements";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import { Input } from "react-native-elements";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { ImageBackground } from "react-native";
 
 const auth = getAuth();
 
@@ -58,6 +64,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
               value={email}
               onChangeText={(text) => setEmail(text)}
               containerStyle={{ marginTop: 10, width: 350 }}
+              leftIcon={<Icon name="envelope" color="#0099FF" size={16} />}
             />
             {errorMessage ? (
               <Text style={styles.error}>{errorMessage}</Text>
@@ -69,7 +76,6 @@ const ForgotPasswordScreen = ({ navigation }) => {
             ) : null}
           </View>
         </View>
-
         <TouchableOpacity style={styles.buttons} onPress={handleResetPassword}>
           <Text style={styles.buttonText}>Reset Password</Text>
         </TouchableOpacity>
@@ -189,7 +195,7 @@ const styles = StyleSheet.create({
     color: "#0099FF",
     fontSize: 13,
     fontWeight: "bold",
-    padding: "10",
+    padding: 10,
     alignSelf: "center",
   },
 });
